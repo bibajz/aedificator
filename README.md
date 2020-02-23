@@ -5,7 +5,7 @@ Python project scaffolding tool.
 Type the following:
 
 ```bash
-$ pip install git+https://github.com/bibajz/aedificator
+$ pip install git+https://github.com/bibajz/aedificator.git@v1.0
 ```
 
 ## Usage
