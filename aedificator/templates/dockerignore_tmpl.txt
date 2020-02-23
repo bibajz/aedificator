@@ -1,0 +1,15 @@
+volumes/*
+
+*.log
+*.pyc
+*.bak
+.git
+.idea
+.vcsode
+*.egg-info
+.venv
+.venv-*
+.tox
+__pycache__
+.mypy_cache
+.pytest_cache
