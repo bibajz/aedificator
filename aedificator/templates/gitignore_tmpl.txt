@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 
 
-# Docker volumes
+# Docker
+!.dockerignore
 volumes/
