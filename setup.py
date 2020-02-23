@@ -8,6 +8,7 @@ setup(
     url="https://github.com/bibajz/aedificator",
     author="Libor Martinek",
     packages=find_packages(),
+    include_package_data=True,
     install_requires=["Jinja2", "click"],
     entry_points={"console_scripts": ["aedificate = aedificator.main:main"]},
 )
