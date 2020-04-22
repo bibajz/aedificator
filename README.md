@@ -5,7 +5,7 @@ Python project scaffolding tool.
 Package is not hosted on PyPI (yet), so you need to install it from GitHub.
 
 ```bash
-$ pip install git+https://github.com/bibajz/aedificator.git@v1.1.1
+$ pip install git+https://github.com/bibajz/aedificator.git@v1.1.2
 ```
 
 ## Usage
