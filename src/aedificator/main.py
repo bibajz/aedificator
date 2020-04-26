@@ -4,7 +4,6 @@ import click
 
 from jinja2 import Environment, PackageLoader
 
-
 TEMPLATE_MAPPING = {
     "dev-requirements_tmpl.txt": "dev-requirements.txt",
     "dockerignore_tmpl.txt": ".dockerignore",

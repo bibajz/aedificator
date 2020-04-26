@@ -2,10 +2,9 @@
 Python project scaffolding tool.
 
 ## Installation
-Package is not hosted on PyPI (yet), so you need to install it from GitHub.
 
 ```bash
-$ pip install git+https://github.com/bibajz/aedificator.git@v1.1.2
+$ pip install aedificator
 ```
 
 ## Usage
@@ -50,7 +49,7 @@ Now, use
 ```bash
 $ tox -e linters
 ```
-for formatting, linting, and type checking (or `tox -e black|flake8|mypy` for just one
+for formatting, linting, and type checking (or `tox -e format|flake8|mypy` for just one
 of them) and
 ```bash
 $ tox -e py37|py38
