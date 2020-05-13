@@ -1,21 +1,31 @@
+import re
 from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 import click
 
 from jinja2 import Environment, PackageLoader
 
-TEMPLATE_MAPPING = {
-    "dev-requirements_tmpl.txt": "dev-requirements.txt",
-    "dockerignore_tmpl.txt": ".dockerignore",
-    "gitignore_tmpl.txt": ".gitignore",
-    "tox_tmpl.txt": "tox.ini",
-    "setup_cfg_tmpl.txt": "setup.cfg",
-}
+# Copy-pasta files have `template` suffix
+TEMPLATES = [
+    "dockerignore.template",
+    "gitignore.template",
+    "Makefile.template",
+    "dev-requirements.txt.template",
+    "setup.cfg.template",
+    "requirements.txt.template",
+    "tox.ini.template",
+]
+
+# Files which are context dependent have `jinja` suffix
+TEMPLATES_TO_RENDER: List[Tuple[str, List[str]]] = [
+    ("setup.py.jinja", ["project_name",])
+]
 
 
-TEMPLATE_TO_RENDER_MAPPING = {
-    "setup_py_tmpl.txt": "setup.py",
-}
+def get_template_context(keys: List[str], context: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract keys from the provided context."""
+    return {k: context[k] for k in iter(keys)}
 
 
 @click.command()
@@ -34,19 +44,28 @@ def main(project_name: str) -> None:
         with dir_path.joinpath("__init__.py").open("w"):
             pass
 
-    with cwd_path_joiner("requirements.txt").open("w"):
-        pass
+    # Create a version file in `src/{project_name}/__version__.py`
+    with cwd_path_joiner("src", project_name, "__version__.py").open("w") as v_file:
+        v_file.write('__version__ = "0.0.1"\n')
 
     jinja_env = Environment(loader=PackageLoader("aedificator", "templates"))
 
-    for template_name, actual in TEMPLATE_MAPPING.items():
+    for template_name in TEMPLATES:
+        actual = re.sub(r"\.template$", "", template_name)
+
+        # Templates with "." prefix are not included in the package - do this hack
+        if actual.startswith("gitignore") or actual.startswith("dockerignore"):
+            actual = "." + actual
+
         with cwd_path_joiner(actual).open("w") as f_name:
             template = jinja_env.get_template(template_name).render()
             f_name.write(template)
 
-    for template_name, actual in TEMPLATE_TO_RENDER_MAPPING.items():
+    project_context = {"project_name": project_name}
+    for template_name, ctx_keys in TEMPLATES_TO_RENDER:
+        actual = re.sub(r"\.jinja$", "", template_name)
         with cwd_path_joiner(actual).open("w") as f_name:
             template = jinja_env.get_template(template_name).render(
-                project_name=project_name
+                **get_template_context(ctx_keys, project_context)
             )
             f_name.write(template)

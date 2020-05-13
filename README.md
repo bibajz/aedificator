@@ -15,19 +15,21 @@ $ aedificate your_project_name
 This will create a following structure:
 ```
 current_working_directory
-│   .dockerignore    
-│   .gitignore
-│   dev-requirements.txt
-│   setup.cfg
-│   setup.py
-│   requirements.txt
-│   tox.ini
-└───src
-│   └───your_project_name
-│       │   __init__.py
-│   
-└───tests
-    │   __init__.py
+├── dev-requirements.txt
+├── .dockerignore
+├── .gitignore
+├── Makefile
+├── requirements.txt
+├── setup.cfg
+├── setup.py
+├── src
+│   └── your_project_name
+│       ├── __init__.py
+│       └── __version__.py
+├── tests
+│   └── __init__.py
+└── tox.ini
+
 ```
 
 You can now start putting your code in the `src/your_project_name` directory. 
@@ -42,7 +44,7 @@ $ python setup.py develop
 Aedificator comes with preconfigured formatting, linting, type checking and testing
 options, leveraging the power of `tox`. If you do not have `tox` installed, type
 ```bash
-$ pip install -U -r dev-requirements.txt 
+$ pip install tox
 ```
 
 Now, use
