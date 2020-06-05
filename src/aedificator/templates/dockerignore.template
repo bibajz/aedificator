@@ -5,7 +5,7 @@ volumes/*
 *.bak
 .git
 .idea
-.vcsode
+.vscode
 *.egg-info
 .venv
 .venv-*

@@ -20,7 +20,9 @@ ignore_missing_imports = True
 line_length = 88
 indent = '    '
 multi_line_output = 3
+known_first_party = {{ project_name }},tests
 include_trailing_comma = True
 
 [tool:pytest]
 addopts = --strict
+testpaths = tests

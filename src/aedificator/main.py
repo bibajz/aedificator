@@ -12,14 +12,15 @@ TEMPLATES = [
     "gitignore.template",
     "Makefile.template",
     "dev-requirements.txt.template",
-    "setup.cfg.template",
     "requirements.txt.template",
     "tox.ini.template",
 ]
 
 # Files which are context dependent have `jinja` suffix
 TEMPLATES_TO_RENDER: List[Tuple[str, List[str]]] = [
-    ("setup.py.jinja", ["project_name",])
+    ("setup.py.jinja", ["project_name",]),
+    ("setup.cfg.jinja", ["project_name",]),
+    ("README.md.jinja", ["project_name",]),
 ]
 
 

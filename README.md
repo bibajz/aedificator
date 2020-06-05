@@ -20,6 +20,7 @@ current_working_directory
 ├── .gitignore
 ├── Makefile
 ├── requirements.txt
+├── README.md
 ├── setup.cfg
 ├── setup.py
 ├── src
