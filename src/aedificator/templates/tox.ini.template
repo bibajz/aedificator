@@ -1,16 +1,15 @@
 [tox]
 minversion=3.14.6
-envlist = py37, py38, linters
+envlist = py38, linters
 
 [testenv]
 deps =
     pytest
-    coverage
 commands =
-    coverage run -m pytest {posargs}
+    pytest
 
 [testenv:linters]
-basepython = python3.7
+basepython = python3
 skip_install = true
 deps =
     {[testenv:format]deps}
@@ -22,7 +21,7 @@ commands =
     {[testenv:mypy]commands}
 
 [testenv:flake8]
-basepython = python3.7
+basepython = python3
 skip_install = true
 deps =
     flake8
@@ -33,19 +32,19 @@ commands =
     flake8 src/ setup.py
 
 [testenv:format]
-basepython = python3.7
+basepython = python3
 skip_install = true
 deps =
     black
     isort
 commands =
     isort --version
-    isort --recursive src/
+    isort src/
     black --version
     black src/ setup.py
 
 [testenv:mypy]
-basepython = python3.7
+basepython = python3
 skip_install = true
 deps =
     mypy
@@ -54,7 +53,7 @@ commands =
     mypy src/ setup.py
 
 [testenv:build]
-basepython = python3.7
+basepython = python3
 skip_install = true
 whitelist_externals =
     make
@@ -66,7 +65,7 @@ commands =
     python setup.py -q sdist bdist_wheel
 
 [testenv:release]
-basepython = python3.7
+basepython = python3
 skip_install = true
 whitelist_externals =
     make

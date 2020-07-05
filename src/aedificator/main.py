@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 import click
-
 from jinja2 import Environment, PackageLoader
 
 # Copy-pasta files have `template` suffix
