@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from setuptools import find_namespace_packages, setup
+from setuptools import setup
 
 
 def get_version(package: str) -> str:
@@ -46,8 +46,8 @@ setup(
     author_email="libasmartinek@protonmail.com",
     package_dir={"": "src"},
     package_data={"": ["*.template", "*.jinja", "py.typed"]},
-    zip_safe=False,
-    packages=find_namespace_packages(where="src"),
+    include_package_data=True,
+    packages=["aedificator"],
     install_requires=get_requirements("requirements.txt"),
     extras_require={"dev": get_requirements("dev-requirements.txt")},
     entry_points={"console_scripts": ["aedificate = aedificator:main"]},
@@ -58,6 +58,7 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Software Development :: Quality Assurance",
