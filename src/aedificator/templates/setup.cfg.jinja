@@ -17,9 +17,7 @@ disallow_untyped_defs = True
 ignore_missing_imports = True
 
 [tool:isort]
-line_length = 88
-indent = '    '
-multi_line_output = 3
+profile = black
 known_first_party = {{ project_name }},tests
 include_trailing_comma = True
 
