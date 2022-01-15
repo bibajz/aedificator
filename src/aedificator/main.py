@@ -1,86 +1,133 @@
-import re
+from __future__ import annotations
+
+from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, NamedTuple, Sequence
 
 import click
 from jinja2 import Environment, PackageLoader
 
-# Copy-pasta files have `template` suffix
+from ._util import extract_keys, transform_str
+
+
+class TemplateData(NamedTuple):
+    name: str
+    context_keys: list[str]
+
+
+DOT_PREFIX = "dot_"
+TEMPLATE_SUFFIX = ".template"
+JINJA_SUFFIX = ".jinja"
+
+TRANSFORM_MAP = {
+    DOT_PREFIX: ".",
+    TEMPLATE_SUFFIX: "",
+    JINJA_SUFFIX: "",
+}
+
+
 TEMPLATES = [
-    "dockerignore.template",
-    "gitignore.template",
-    "Makefile.template",
-    "dev-requirements.txt.template",
-    "requirements.txt.template",
-    "tox.ini.template",
-]
-
-# Files which are context dependent have `jinja` suffix
-TEMPLATES_TO_RENDER: List[Tuple[str, List[str]]] = [
-    (
-        "setup.py.jinja",
-        [
-            "project_name",
-        ],
-    ),
-    (
-        "setup.cfg.jinja",
-        [
-            "project_name",
-        ],
-    ),
-    (
-        "README.md.jinja",
-        [
-            "project_name",
-        ],
-    ),
+    # Copy-pasta files have `template` suffix.
+    # XXX: I encountered some problems with prefixing the files with `.`, therefore
+    #   resort to this `dot_` prefix.
+    TemplateData(DOT_PREFIX + "dockerignore" + TEMPLATE_SUFFIX, []),
+    TemplateData(DOT_PREFIX + "gitignore" + TEMPLATE_SUFFIX, []),
+    TemplateData("Makefile" + TEMPLATE_SUFFIX, []),
+    TemplateData("dev-requirements.txt" + TEMPLATE_SUFFIX, []),
+    TemplateData("requirements.txt" + TEMPLATE_SUFFIX, []),
+    TemplateData("tox.ini" + TEMPLATE_SUFFIX, []),
+    # Files which are context dependent have `jinja` suffix
+    TemplateData("setup.py" + JINJA_SUFFIX, ["project_name"]),
+    TemplateData("setup.cfg" + JINJA_SUFFIX, ["project_name"]),
+    TemplateData("README.md" + JINJA_SUFFIX, ["project_name"]),
 ]
 
 
-def get_template_context(keys: List[str], context: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract keys from the provided context."""
-    return {k: context[k] for k in iter(keys)}
+def package_structure(project_name: str) -> list[tuple[str, ...]]:
+    return [("src", project_name), ("tests",)]
+
+
+def convert_dir_to_python_package(dir_path: Path) -> None:
+    with dir_path.joinpath("__init__.py").open("w", encoding="utf-8"):
+        pass
+
+
+def create_python_package(
+    path_joiner: Callable[..., Path],
+    dirs: Sequence[str],
+) -> None:
+    dir_path = path_joiner(*dirs)
+    dir_path.mkdir(parents=True, exist_ok=True)
+    convert_dir_to_python_package(dir_path)
+
+
+def create_version_file(
+    path_joiner: Callable[..., Path],
+    project_name: str,
+) -> None:
+    with path_joiner("src", project_name, "__version__.py").open(
+        "w", encoding="utf-8"
+    ) as f:
+        f.write('__version__ = "0.0.1"\n')
+
+
+def render_with_ctx(
+    jinja_env: Environment,
+    template_data: TemplateData,
+    context: dict[str, Any],
+) -> str:
+    return jinja_env.get_template(template_data.name).render(
+        **extract_keys(context, template_data.context_keys)
+    )
+
+
+def create_from_template(
+    path_joiner: Callable[..., Path],
+    name_transformer: Callable[[str], str],
+    jinja_env: Environment,
+    template_data: TemplateData,
+    context: dict[str, Any],
+) -> None:
+    actual = name_transformer(template_data.name)
+    with path_joiner(actual).open("w", encoding="utf-8") as f_name:
+        f_name.write(render_with_ctx(jinja_env, template_data, context))
+        f_name.write("\n")
+
+
+TARGET_DIR_HELP_MSG = "Desired destination of the scaffolding."
 
 
 @click.command()
+@click.option(
+    "--target-dir",
+    "-t",
+    default=".",
+    type=str,
+    show_default=True,
+    help=TARGET_DIR_HELP_MSG,
+)
 @click.argument("project_name", type=str)
-def main(project_name: str) -> None:
-    """Type the project name and let the aedificator do the (boring) scaffolding."""
+def main(target_dir: str, project_name: str) -> None:
+    """
+    Type the project name and let the aedificator do the (boring) scaffolding.
 
-    cwd = Path.cwd()
-    cwd_path_joiner = cwd.joinpath
+    """
+
+    path_joiner = Path(target_dir).resolve().joinpath
 
     # Create package structure.
-    for d_name in ["tests", f"src/{project_name}"]:
-        dir_path = cwd_path_joiner(d_name)
-        dir_path.mkdir(parents=True, exist_ok=True)
-
-        with dir_path.joinpath("__init__.py").open("w"):
-            pass
+    for subpackage_path in package_structure(project_name):
+        create_python_package(path_joiner, subpackage_path)
 
     # Create a version file in `src/{project_name}/__version__.py`
-    with cwd_path_joiner("src", project_name, "__version__.py").open("w") as v_file:
-        v_file.write('__version__ = "0.0.1"\n')
+    create_version_file(path_joiner, project_name)
 
-    jinja_env = Environment(loader=PackageLoader("aedificator", "templates"))
-
-    for template_name in TEMPLATES:
-        actual = re.sub(r"\.template$", "", template_name)
-
-        # Templates with "." prefix are not included in the package - do this hack
-        if actual.startswith("gitignore") or actual.startswith("dockerignore"):
-            actual = "." + actual
-
-        with cwd_path_joiner(actual).open("w") as f_name:
-            template = jinja_env.get_template(template_name).render()
-            f_name.write(template)
-
-    project_context = {"project_name": project_name}
-    for template_name, ctx_keys in TEMPLATES_TO_RENDER:
-        actual = re.sub(r"\.jinja$", "", template_name)
-        with cwd_path_joiner(actual).open("w") as f_name:
-            template = jinja_env.get_template(template_name).render(
-                **get_template_context(ctx_keys, project_context)
-            )
-            f_name.write(template)
+    # Render and save the templates.
+    for template in TEMPLATES:
+        create_from_template(
+            path_joiner,
+            partial(transform_str, transforms=list(TRANSFORM_MAP.items())),
+            Environment(loader=PackageLoader("aedificator", "templates")),
+            template,
+            {"project_name": project_name},
+        )
