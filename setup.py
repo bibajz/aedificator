@@ -28,9 +28,7 @@ def get_long_description(readme_file: str) -> str:
     Extract README from provided file.
     """
     readme_path = Path(readme_file)
-    long_description = (
-        readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
-    )
+    long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
     return long_description
 
 

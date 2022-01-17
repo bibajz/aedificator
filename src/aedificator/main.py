@@ -65,9 +65,7 @@ def create_version_file(
     path_joiner: Callable[..., Path],
     project_name: str,
 ) -> None:
-    with path_joiner("src", project_name, "__version__.py").open(
-        "w", encoding="utf-8"
-    ) as f:
+    with path_joiner("src", project_name, "__version__.py").open("w", encoding="utf-8") as f:
         f.write('__version__ = "0.0.1"\n')
 
 

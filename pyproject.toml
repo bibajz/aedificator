@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 100
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+known_first_party = ["aedificator", "tests"]
+known_third_party = ["click" , "jinja"]
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --doctest-modules"
+
