@@ -1,3 +1,49 @@
+[build-system]
+requires = ["flit >=3.6.0,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "aedificator"
+authors = [
+    {name = "Libor Martinek", email="libasmartinek@protonmail.com"}
+]
+dependencies = [
+    "Jinja2",
+    "click",
+]
+requires-python = ">=3.7"
+readme = "README.md"
+keywords = [
+    "automation",
+    "scaffolding",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dynamic = ["version", "description"]
+
+[project.optional-dependencies]
+dev = [
+    "tox",
+    "flit",
+]
+
+[project.urls]
+Home = "https://github.com/bibajz/aedificator"
+
+[project.scripts]
+aedificate = "aedificator:main"
+
 [tool.black]
 line-length = 100
 include = '\.pyi?$'
