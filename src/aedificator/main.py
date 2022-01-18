@@ -13,6 +13,7 @@ from ._util import extract_keys, transform_str
 class TemplateData(NamedTuple):
     name: str
     context_keys: list[str]
+    target: str = "."
 
 
 DOT_PREFIX = "dot_"
@@ -33,13 +34,13 @@ TEMPLATES = [
     TemplateData(DOT_PREFIX + "dockerignore" + TEMPLATE_SUFFIX, []),
     TemplateData(DOT_PREFIX + "gitignore" + TEMPLATE_SUFFIX, []),
     TemplateData("Makefile" + TEMPLATE_SUFFIX, []),
-    TemplateData("dev-requirements.txt" + TEMPLATE_SUFFIX, []),
-    TemplateData("requirements.txt" + TEMPLATE_SUFFIX, []),
     TemplateData("tox.ini" + TEMPLATE_SUFFIX, []),
+    TemplateData("mypy.ini" + TEMPLATE_SUFFIX, []),
     # Files which are context dependent have `jinja` suffix
-    TemplateData("setup.py" + JINJA_SUFFIX, ["project_name"]),
-    TemplateData("setup.cfg" + JINJA_SUFFIX, ["project_name"]),
     TemplateData("README.md" + JINJA_SUFFIX, ["project_name"]),
+    TemplateData(DOT_PREFIX + "flake8" + JINJA_SUFFIX, ["line_length"]),
+    TemplateData("pyproject.toml" + JINJA_SUFFIX, ["project_name", "line_length"]),
+    TemplateData("__init__.py" + JINJA_SUFFIX, ["project_name"], target="./src/{project_name}/"),
 ]
 
 
@@ -61,14 +62,6 @@ def create_python_package(
     convert_dir_to_python_package(dir_path)
 
 
-def create_version_file(
-    path_joiner: Callable[..., Path],
-    project_name: str,
-) -> None:
-    with path_joiner("src", project_name, "__version__.py").open("w", encoding="utf-8") as f:
-        f.write('__version__ = "0.0.1"\n')
-
-
 def render_with_ctx(
     jinja_env: Environment,
     template_data: TemplateData,
@@ -87,12 +80,10 @@ def create_from_template(
     context: dict[str, Any],
 ) -> None:
     actual = name_transformer(template_data.name)
-    with path_joiner(actual).open("w", encoding="utf-8") as f_name:
-        f_name.write(render_with_ctx(jinja_env, template_data, context))
-        f_name.write("\n")
-
-
-TARGET_DIR_HELP_MSG = "Desired destination of the scaffolding."
+    target_dir = template_data.target.format(**context)
+    with path_joiner(target_dir, actual).open("w", encoding="utf-8") as f:
+        f.write(render_with_ctx(jinja_env, template_data, context))
+        f.write("\n")
 
 
 @click.command()
@@ -102,10 +93,18 @@ TARGET_DIR_HELP_MSG = "Desired destination of the scaffolding."
     default=".",
     type=str,
     show_default=True,
-    help=TARGET_DIR_HELP_MSG,
+    help="Desired destination of the scaffolding.",
+)
+@click.option(
+    "--line-length",
+    "-l",
+    default=100,
+    type=click.IntRange(min=80),
+    show_default=True,
+    help="Maximum line length enforced by Black and flake8.",
 )
 @click.argument("project_name", type=str)
-def main(target_dir: str, project_name: str) -> None:
+def main(target_dir: str, line_length: int, project_name: str) -> None:
     """
     Type the project name and let the aedificator do the (boring) scaffolding.
 
@@ -117,9 +116,6 @@ def main(target_dir: str, project_name: str) -> None:
     for subpackage_path in package_structure(project_name):
         create_python_package(path_joiner, subpackage_path)
 
-    # Create a version file in `src/{project_name}/__version__.py`
-    create_version_file(path_joiner, project_name)
-
     # Render and save the templates.
     for template in TEMPLATES:
         create_from_template(
@@ -127,5 +123,8 @@ def main(target_dir: str, project_name: str) -> None:
             partial(transform_str, transforms=list(TRANSFORM_MAP.items())),
             Environment(loader=PackageLoader("aedificator", "templates")),
             template,
-            {"project_name": project_name},
+            {
+                "project_name": project_name,
+                "line_length": line_length,
+            },
         )

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["flit >=3.6.0,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "{{ project_name }}"
+authors = []  # format is {name = "...", email = "..."}
+dependencies = [ ]  # Put your requirements here
+requires-python = ">=3.7"
+readme = "README.md"
+dynamic = ["version", "description"]
+
+[project.optional-dependencies]
+dev = [ ] # Put your development requirements here
+
+[tool.black]
+line-length = {{ line_length }}
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+known_first_party = ["{{ project_name }}", "tests"]
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --doctest-modules"
