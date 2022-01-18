@@ -1,10 +1,11 @@
 [tox]
+isolated_build = True
 minversion=3.14.6
-envlist = py{37,38,39}, linters
+envlist = py{37,38,39,310}, linters
 
 [testenv]
 deps =
-    -r {toxinidir}/requirements.txt
+    ; Do not forget to put your requirements here.
     pytest
 commands =
     pytest
@@ -30,7 +31,7 @@ deps =
 
 commands =
     flake8 --version
-    flake8 src/ tests/ setup.py
+    flake8 src/ tests/
 
 [testenv:format]
 basepython = python3
@@ -40,39 +41,36 @@ deps =
     isort
 commands =
     isort --version
-    isort src/ tests/ setup.py
+    isort src/ tests/
     black --version
-    black src/ tests/ setup.py
+    black src/ tests/
 
 [testenv:mypy]
 basepython = python3
 skip_install = true
 deps =
+    ; Do not forget to put your requirements here.
     mypy
 commands =
     mypy --version
-    mypy src/ setup.py
+    mypy src/
 
 [testenv:build]
 basepython = python3
-skip_install = true
 whitelist_externals =
     make
 deps =
-    wheel
-    setuptools
+    flit
 commands =
     make clean
-    python setup.py -q sdist bdist_wheel
+    flit build
 
 [testenv:release]
 basepython = python3
-skip_install = true
 whitelist_externals =
     make
 deps =
     {[testenv:build]deps}
-    twine
 commands =
     {[testenv:build]commands}
-    twine upload --skip-existing dist/*
+    flit publish

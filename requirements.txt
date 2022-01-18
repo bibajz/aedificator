@@ -1,3 +1,0 @@
-Jinja2
-click
-typing_extensions

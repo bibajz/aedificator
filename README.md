@@ -15,18 +15,15 @@ $ aedificate your_project_name
 This will create a following structure:
 ```
 current_working_directory
-├── dev-requirements.txt
 ├── .dockerignore
+├── .flake8
 ├── .gitignore
 ├── Makefile
-├── requirements.txt
+├── mypy.ini
 ├── README.md
-├── setup.cfg
-├── setup.py
 ├── src
 │   └── your_project_name
-│       ├── __init__.py
-│       └── __version__.py
+│       └── __init__.py
 ├── tests
 │   └── __init__.py
 └── tox.ini
@@ -35,13 +32,15 @@ current_working_directory
 
 You can now start putting your code in the `src/your_project_name` directory. 
 
+### Additional options
+
+- `--target-dir` change the directory where the scaffolding happens (default: `.`)
+- `--line-length` change the maximum line length to be enforced by `Black` and `flake8`
+
+Consult `$ aedificate --help` for up-to-date info.
+
 ---------------------------------------------------------------------------------------
-To start developing, first, tweak `setup.py` file and type (preferably in some
-dedicated virtual environment)
-```bash
-$ python setup.py develop
-```
----------------------------------------------------------------------------------------
+
 Aedificator comes with preconfigured formatting, linting, type checking and testing
 options, leveraging the power of `tox`. If you do not have `tox` installed, type
 ```bash
@@ -55,7 +54,7 @@ $ tox -e linters
 for formatting, linting, and type checking (or `tox -e format|flake8|mypy` for just one
 of them) and
 ```bash
-$ tox -e py37|py38
+$ tox -e py37|py38|py39|p310
 ```
 for your test suites. 
 

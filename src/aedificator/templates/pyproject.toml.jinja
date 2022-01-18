@@ -11,7 +11,10 @@ readme = "README.md"
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-dev = [ ] # Put your development requirements here
+dev = [
+    "tox",
+    "flit",
+]
 
 [tool.black]
 line-length = {{ line_length }}
