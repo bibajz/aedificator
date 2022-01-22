@@ -19,7 +19,6 @@ current_working_directory
 ├── .flake8
 ├── .gitignore
 ├── Makefile
-├── mypy.ini
 ├── README.md
 ├── src
 │   └── your_project_name
