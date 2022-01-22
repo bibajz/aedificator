@@ -54,6 +54,28 @@ known_first_party = ["aedificator", "tests"]
 known_third_party = ["click" , "jinja"]
 include_trailing_comma = true
 
+[tool.mypy]
+# Pretty strict settings, mostly "borrowed" (xD) from mypy settings Black has.
+disallow_untyped_calls = true
+warn_return_any = true
+strict_optional = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+warn_unreachable = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_configs = true
+# Disabling incremental mode is required for `warn_unused_configs = true` to work
+incremental = false
+strict_equality = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
 [tool.pytest.ini_options]
 addopts = "--strict-markers --doctest-modules"
 

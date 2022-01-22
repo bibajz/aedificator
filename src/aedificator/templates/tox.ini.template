@@ -53,7 +53,7 @@ deps =
     mypy
 commands =
     mypy --version
-    mypy src/
+    mypy src/ tests/
 
 [testenv:build]
 basepython = python3

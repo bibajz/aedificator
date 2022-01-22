@@ -35,7 +35,6 @@ TEMPLATES = [
     TemplateData(DOT_PREFIX + "gitignore" + TEMPLATE_SUFFIX, []),
     TemplateData("Makefile" + TEMPLATE_SUFFIX, []),
     TemplateData("tox.ini" + TEMPLATE_SUFFIX, []),
-    TemplateData("mypy.ini" + TEMPLATE_SUFFIX, []),
     # Files which are context dependent have `jinja` suffix
     TemplateData("README.md" + JINJA_SUFFIX, ["project_name"]),
     TemplateData(DOT_PREFIX + "flake8" + JINJA_SUFFIX, ["line_length"]),
